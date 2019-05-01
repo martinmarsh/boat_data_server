@@ -30,15 +30,13 @@ class CORSComponent(object):
 
 api = application = falcon.API(middleware=[CORSComponent()])
 
-currentDirectory = os.getcwd()
+current_directory = os.getcwd()
+print(current_directory)
 boat_data_resource = Resource()
 api.add_route('/boat_data', boat_data_resource)
-api.add_static_route('/', f'{currentDirectory}/build/')
-api.add_static_route('/css',f'{currentDirectory}/build/css/')
-api.add_static_route('/media',f'{currentDirectory}/build/media/')
-
-
-
+api.add_static_route('/', '{}/build/'.format(current_directory))
+api.add_static_route('/css', '{}/build/css/'.format(current_directory))
+api.add_static_route('/media', '{}/build/media/'.format(current_directory))
 
 process_start()
 

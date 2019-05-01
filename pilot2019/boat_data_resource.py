@@ -64,8 +64,9 @@ class Resource:
 
     def on_post(self, req, resp):
 
+        self.doc_in = req.media
         if 0 < req.content_length < 10000:
-            self.doc_in = json.load(req.stream)
+            # self.doc_in = json.load(req.stream)
             self.write_doc_section('course')
             self.write_doc_section('auto_helm')
 
