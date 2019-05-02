@@ -111,7 +111,7 @@ venv.bak/
 .spyproject
 
 # Rope project settings
-.ropeproject
+git.ropeproject
 
 # mkdocs documentation
 /site
