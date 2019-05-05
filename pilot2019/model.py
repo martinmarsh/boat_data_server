@@ -81,7 +81,7 @@ class BoatModel:
         self._read_cmps_data()
         self.dt = dt
 
-    def helm_drive(self, helm_adjust, damping):
+    def helm_drive(self, helm_adjust):
         if helm_adjust < 0:
             self._port()
             self.helm_direction = -1
@@ -89,7 +89,7 @@ class BoatModel:
             self._starboard()
             self.helm_direction = +1
 
-        self.power = abs(helm_adjust) / damping
+        self.power = abs(helm_adjust)
         if self.power > 0.99:
             self.power = 1
         # 5khz rate - pulse width is fraction of 1M

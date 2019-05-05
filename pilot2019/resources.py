@@ -3,7 +3,43 @@ import falcon
 from .task import BoatData
 
 
-class Resource:
+class CompassResource:
+    doc_in = None
+
+    @staticmethod
+    def get_doc():
+        return {
+            'course':
+                {
+                    'heading': BoatData.heading.value/10,
+                    'cts': BoatData.cts.value/10,
+                    'error': BoatData.error.value/10
+                }
+        }
+
+    def on_get(self, req, resp):
+        doc = self.get_doc()
+        # Create a JSON representation of the resource
+        resp.body = json.dumps(doc, ensure_ascii=False)
+        resp.status = falcon.HTTP_200
+
+    def on_post(self, req, resp):
+        """Only cts will be updated via POST of course structure other values ignored
+        """
+        self.doc_in = req.media
+        sec_data = self.doc_in.get('course')
+        cts = sec_data.get('cts', None)
+        if cts is not None:
+            attr = getattr(BoatData, 'cts', None)
+            attr.value = int(cts * 10)
+
+        doc = self.get_doc()
+        # Create a JSON representation of the resource
+        resp.body = json.dumps(doc, ensure_ascii=False)
+        resp.status = falcon.HTTP_201
+
+
+class BoatDataResource:
     doc_in = None
 
     @staticmethod
@@ -78,4 +114,3 @@ class Resource:
         # status returned by the framework, but it is included here to
         # illustrate how this may be overridden as needed.
         resp.status = falcon.HTTP_201
-

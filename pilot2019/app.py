@@ -1,5 +1,5 @@
 import falcon
-from .boat_data_resource import Resource
+from .resources import BoatDataResource, CompassResource
 from .task import process_start
 import os
 
@@ -31,9 +31,12 @@ class CORSComponent(object):
 api = application = falcon.API(middleware=[CORSComponent()])
 
 current_directory = os.getcwd()
-print(current_directory)
-boat_data_resource = Resource()
+
+boat_data_resource = BoatDataResource()
+compass_resource = CompassResource()
+
 api.add_route('/boat_data', boat_data_resource)
+api.add_route('/compass', compass_resource)
 api.add_static_route('/', '{}/build/'.format(current_directory))
 api.add_static_route('/css', '{}/build/css/'.format(current_directory))
 api.add_static_route('/media', '{}/build/media/'.format(current_directory))
