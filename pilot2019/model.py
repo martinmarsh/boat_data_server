@@ -11,13 +11,13 @@ class BoatModel:
         self._cm = self._pi.i2c_open(1, 0x60)  # compass module CMPS12
         self.calibration = None
         self.power = 0
-        self.heading = 0
-        self.head_correction = 0
+        self.compass = 0
+        self.compass_correction = 0
         self.helm_direction = 1
         self.roll = 0
         self.pitch = 0
         self.run = 0
-        self.dt = 0
+
 
     def _port(self):
         self._pi.write(23, 0)
@@ -39,19 +39,30 @@ class BoatModel:
             self._pi.i2c_read_byte_data(self._cm, lo_reg)
         ], byteorder='big', signed=True)
 
-    def _read_cmps_data(self):
+    def read_compass(self):
         # Read Compass in  deci-degrees
-        self.heading = self._read_signed_word(2, 3) + self.head_correction
-
-        if self.heading > 3600:
-            self.heading -= 3600
-        if self.heading < 0:
-            self.heading += 3600
-
+        self.compass = self._read_signed_word(2, 3) + self.compass_correction
         self.calibration = self._pi.i2c_read_byte_data(self._cm, 0x1E)
 
-        self.roll = self._pi.i2c_read_byte_data(self._cm, 5)
+        if self.compass > 3600:
+            self.compass -= 3600
+        if self.compass < 0:
+            self.compass += 3600
+        return self.compass
+
+    def read_pitch(self):
         self.pitch = self._pi.i2c_read_byte_data(self._cm, 4)
+        return self.pitch
+
+    def read_roll(self):
+        self.roll = self._pi.i2c_read_byte_data(self._cm, 5)
+        return self.pitch
+
+    def _read_cmps_data(self):
+        # Read Compass in  deci-degrees
+        self.read_compass()
+        self.read_pitch()
+        self.read_roll()
 
         acc_x = self._read_signed_word(0x0C, 0x0D)
         acc_y = self._read_signed_word(0x0E, 0x0F)
@@ -72,14 +83,13 @@ class BoatModel:
 
         print("{} temp {} head {} {} roll {} pitch {} {}"
               "  acc {} {} {}  gyo {} {} {} mag {} {} {}".
-              format(self.calibration, temp, self.heading, bosch_heading, self.roll, self.pitch, pitch_16,
+              format(self.calibration, temp, self.compass, bosch_heading, self.roll, self.pitch, pitch_16,
                      acc_x, acc_y, acc_z,
                      gyo_x, gyo_y, gyo_z, mag_x, mag_y, mag_z
                      ))
 
-    def update(self, dt):
+    def update(self):
         self._read_cmps_data()
-        self.dt = dt
 
     def helm_drive(self, helm_adjust):
         if helm_adjust < 0:
