@@ -31,6 +31,7 @@ class CORSComponent(object):
 api = application = falcon.API(middleware=[CORSComponent()])
 
 current_directory = os.getcwd()
+print(current_directory)
 
 boat_data_resource = BoatDataResource()
 compass_resource = CompassResource()
