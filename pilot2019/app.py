@@ -37,9 +37,9 @@ compass_resource = CompassResource()
 
 api.add_route('/boat_data', boat_data_resource)
 api.add_route('/compass', compass_resource)
-api.add_static_route('/', '{}/build/'.format(current_directory))
-api.add_static_route('/css', '{}/build/css/'.format(current_directory))
-api.add_static_route('/media', '{}/build/media/'.format(current_directory))
+api.add_static_route('/', '{}/web/'.format(current_directory))
+api.add_static_route('/css', '{}/web/css/'.format(current_directory))
+api.add_static_route('/media', '{}/web/media/'.format(current_directory))
 
 process_start()
 
