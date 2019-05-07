@@ -20,7 +20,10 @@ class Monitor:
         self.cts = -1
         self.pid = self.kp = self.ki = self.kd = None
         self.compass_sample_time = .25
-        self.auto_helm_sample = 4
+        self.orientation_sample = 60   # 15 secs at .25
+        self.auto_helm_sample = 4      # 15 secs at .25
+        self.pitch_total = 0
+        self.roll_total = 0
         self.compass_read_at = self.helm_last_read_at = self.compass_read_at = None
         self.heading = 0
         self.last_heading = 0;
@@ -61,34 +64,39 @@ class Monitor:
 
         helm_adjust = self.pid(turn_rate) / self.bd.damping.value
 
-        self.bd.dt.value = dt
         self.boat.helm_drive(helm_adjust)
-
-        self.bd.helm_adjust.value = helm_adjust
-        self.bd.desired_rate.value = desired_rate
-        self.bd.turn_rate.value = turn_rate
+        self.bd.turn_rate.value = int(turn_rate/10)
         self.bd.power.value = (self.boat.power * self.boat.helm_direction)
 
     def loop_for_ever(self):
         self.helm_last_read_at = self.compass_read_at = monotonic()
         self.last_heading = self.heading = self.boat.read_compass()
         self.set_pid()
-        count = 0
+
+        helm_count = 0
+        orientation_count = 0
 
         while True:
             sleep(self.compass_sample_time)
+            pitch = self.boat.read_pitch()
+            roll = self.boat.read_roll()
+            self.bd.pitch.value = pitch
+            self.bd.roll.value = roll
+            self.pitch_total += abs(pitch)
+            self.roll_total += abs(roll)
             self.heading = self.boat.read_compass()
             self.compass_read_at = monotonic()
-            self.bd.heading.value = self.heading
-            self.cts = self.bd.cts.value
-            count += 1
-
-            if count == self.auto_helm_sample:
+            self.bd.heading.value = round(self.heading/10, 1)
+            self.cts = int(self.bd.cts.value * 10)
+            self.bd.calibration.value = self.boat.calibration
+            helm_count += 1
+            orientation_count += 1
+            if helm_count == self.auto_helm_sample:
                 self.auto_helm()
-                count = 0
-
-                self.bd.roll.value = self.boat.read_roll()
-                self.bd.pitch.value = self.boat.read_pitch()
-
-                self.bd.calibration.value = self.boat.calibration
-                self.bd.error.value = relative_direction(self.heading - self.cts)
+                helm_count = 0
+            if orientation_count == self.orientation_sample:
+                self.bd.max_roll.value = int(self.roll_total/self.orientation_sample)
+                self.roll_total = 0
+                self.bd.max_pitch.value = int(self.pitch_total / self.orientation_sample)
+                self.pitch_total = 0
+                orientation_count = 0

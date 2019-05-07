@@ -14,24 +14,22 @@ class BoatData:
 
 
     """
-    heading = Value('i', 0)
+    heading = Value('f', 0.0)
     roll = Value('i', 0)
     pitch = Value('i', 0)
+    max_roll = Value('i', 0)
+    max_pitch = Value('i', 0)
     cts = Value('i', 0)
     power = Value('f', 0.0)
     config = Value('i', 0)
-    error = Value('f', 0.0)
     calibration = Value('i', 0)
-    helm_adjust = Value('f', 0.0)
-    desired_rate = Value('f', 0.0)
-    turn_rate = Value('f', 0.0)
-    dt = Value('f', 0.0)
+    turn_rate = Value('i', 0)
     kp = Value('f', 1)
     ki = Value('f', 0.5)
     kd = Value('f', 0.2)
     damping = Value('i', 200)
-    del_cal = Value('i', 0)
     set_cal = Value('i', 0)
+    set_helm = Value('i', 0)
 
 
 def background(bd):

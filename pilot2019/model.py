@@ -18,7 +18,6 @@ class BoatModel:
         self.pitch = 0
         self.run = 0
 
-
     def _port(self):
         self._pi.write(23, 0)
         if self.run:
