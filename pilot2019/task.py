@@ -23,7 +23,6 @@ class BoatData:
     power = Value('f', 0.0)
     config = Value('i', 0)
     calibration = Value('i', 0)
-    turn_rate = Value('i', 0)
     kp = Value('f', 1)
     ki = Value('f', 0.05)
     kd = Value('f', 0.5)
@@ -39,5 +38,3 @@ def background(bd):
 def process_start():
     p = Process(target=background, args=(BoatData,))
     p.start()
-
-

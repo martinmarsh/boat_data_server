@@ -57,7 +57,6 @@ class FullResource:
                     'roll': BoatData.roll.value,
                     'max_pitch': BoatData.max_pitch.value,
                     'max_roll': BoatData.max_roll.value,
-                    'turn_rate': BoatData.turn_rate.value,
                 },
             'auto_helm':
                 {
