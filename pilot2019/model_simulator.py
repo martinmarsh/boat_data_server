@@ -13,25 +13,25 @@ class BoatModel:
         self.run = 0
 
         self.helm = 0
-        self.gain = 200
+        self.gain = 10
         self.momentum = 1
         self.helm_direction = 1
         self.power_bias = 0
         self.last_read_at = monotonic()
-        self.read_at =  self.last_read_at
+        self.read_at = self.last_read_at
 
     def read_compass(self):
         self.read_at = monotonic()
         dt = self.read_at - self.last_read_at
         self.last_read_at = self.read_at
-        self.helm += (self.power * dt * self.helm_direction + self.power_bias) * self.gain
+        self.helm += (self.power * self.helm_direction + self.power_bias) * self.gain * dt
 
         self.compass += int(self.helm * dt * self.momentum)
         if self.compass > 3600:
             self.compass -= 3600
         elif self.compass < 0:
             self.compass += 3600
-        print(self.compass, dt)
+        # print(self.compass, round(dt, 3))
         return self.compass
 
     def read_pitch(self):
@@ -52,6 +52,8 @@ class BoatModel:
         self.power = abs(helm_adjust)
         if self.power > 0.99:
             self.power = 1
+        elif self.power < 0.01:
+            self.power = 0
         print(self.helm, self.power * self.helm_direction)
 
     def config_save(self):

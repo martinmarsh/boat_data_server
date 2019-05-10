@@ -101,6 +101,8 @@ class BoatModel:
         self.power = abs(helm_adjust)
         if self.power > 0.99:
             self.power = 1
+        elif self.power < 0.01:
+            self.power = 0
         # 5khz rate - pulse width is fraction of 1M
         self._pi.hardware_PWM(18, 5000, int(self.power * 1000000))
 

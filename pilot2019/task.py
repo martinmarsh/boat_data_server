@@ -25,9 +25,9 @@ class BoatData:
     calibration = Value('i', 0)
     turn_rate = Value('i', 0)
     kp = Value('f', 1)
-    ki = Value('f', 0.5)
-    kd = Value('f', 0.2)
-    damping = Value('i', 200)
+    ki = Value('f', 0.05)
+    kd = Value('f', 0.5)
+    damping = Value('i', 20)
     set_cal = Value('i', 0)
     set_helm = Value('i', 0)
 
