@@ -24,7 +24,7 @@ class Monitor:
         self.loop_for_ever()
 
     def helm_calibration(self):
-        self.helm.set_pid(self.bd.kp.value, self.bd.ki.value, self.bd.kd.value, self.bd.damping.value)
+        self.helm.set_pid(self.bd.kp.value, self.bd.ki.value, self.bd.kd.value, self.bd.gain.value)
 
     def auto_helm(self):
         dt = self.compass_read_at - self.helm_last_read_at

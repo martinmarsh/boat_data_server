@@ -13,7 +13,7 @@ class BoatModel:
         self.run = 0
 
         self.helm = 0
-        self.gain = 10
+        self.gain = 0.01
         self.momentum = 1
         self.helm_direction = 1
         self.power_bias = 0
@@ -44,17 +44,18 @@ class BoatModel:
         self.read_compass()
 
     def helm_drive(self, helm_adjust):
-        if helm_adjust < 0:
-            self.helm_direction = -1
-        elif helm_adjust > 0:
-            self.helm_direction = 1
+        """
+           Drives the helm motor using PWM where 1,000,000 is
+           full on
+           :param helm_adjust: +/- 1000 for full on
+           :return:
+           """
 
-        self.power = abs(helm_adjust)
-        if self.power > 0.99:
-            self.power = 1
-        elif self.power < 0.01:
-            self.power = 0
-        print(self.helm, self.power * self.helm_direction)
+        self.helm_direction = 1 if helm_adjust > 0 else -1
+
+        self.power = min(abs(helm_adjust), 1000)
+
+        print(self.power * self.helm_direction)
 
     def config_save(self):
         pass

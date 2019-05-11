@@ -61,7 +61,7 @@ class FullResource:
             'auto_helm':
                 {
                     'power': BoatData.power.value,
-                    'damping': BoatData.damping.value,
+                    'gain': BoatData.gain.value,
                     'kp': BoatData.kp.value,
                     'ki': BoatData.ki.value,
                     'kd': BoatData.kd.value,
@@ -78,7 +78,7 @@ class FullResource:
                 if attr:
                     if var in ['kp', 'ki', 'kd']:
                         attr.value = float(val)
-                    elif var in ['damping', 'set_cal', 'set_helm', 'cts']:
+                    elif var in ['gain', 'set_cal', 'set_helm', 'cts']:
                         attr.value = int(val)
 
     def on_get(self, req, resp):
