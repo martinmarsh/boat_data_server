@@ -1,5 +1,5 @@
 import falcon
-from .resources import FullResource, FastResource
+from .resources import CalibrationResource, OrientationResource
 from .task import process_start
 import os
 
@@ -33,11 +33,11 @@ api = application = falcon.API(middleware=[CORSComponent()])
 current_directory = os.getcwd()
 print(current_directory)
 
-full = FullResource()
-fast = FastResource()
+calibration_resource = CalibrationResource()
+orientation_resource = OrientationResource()
 
-api.add_route('/full', full)
-api.add_route('/fast', fast)
+api.add_route('/calibration', calibration_resource)
+api.add_route('/orientation', orientation_resource)
 api.add_static_route('/', '{}/web/'.format(current_directory))
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))

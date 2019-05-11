@@ -5,7 +5,7 @@ class BoatModel:
 
     def __init__(self):
         self.calibration = 0
-        self.power = 0
+        self._power = 0
         self.compass = 0
         self.compass_correction = 0
         self.roll = 0
@@ -15,7 +15,7 @@ class BoatModel:
         self.helm = 0
         self.gain = 0.01
         self.momentum = 1
-        self.helm_direction = 1
+        self._direction = 1
         self.power_bias = 0
         self.last_read_at = monotonic()
         self.read_at = self.last_read_at
@@ -24,7 +24,7 @@ class BoatModel:
         self.read_at = monotonic()
         dt = self.read_at - self.last_read_at
         self.last_read_at = self.read_at
-        self.helm += (self.power * self.helm_direction + self.power_bias) * self.gain * dt
+        self.helm += (self._power * self._direction + self.power_bias) * self.gain * dt
 
         self.compass += int(self.helm * dt * self.momentum)
         if self.compass > 3600:
@@ -43,19 +43,17 @@ class BoatModel:
     def update(self):
         self.read_compass()
 
-    def helm_drive(self, helm_adjust):
+    def helm_drive(self, power, direction):
         """
-           Drives the helm motor using PWM where 1,000,000 is
-           full on
-           :param helm_adjust: +/- 1000 for full on
-           :return:
-           """
-
-        self.helm_direction = 1 if helm_adjust > 0 else -1
-
-        self.power = min(abs(helm_adjust), 1000)
-
-        print(self.power * self.helm_direction)
+        Drives the helm motor using PWM where 1,000,000 is
+        full on
+        :param power: +/- 1000 for full on
+        :param direction: 1 for starboard -1 for port
+        :return:
+        """
+        self._direction = direction
+        self._power = power
+        print(power * direction)
 
     def config_save(self):
         pass

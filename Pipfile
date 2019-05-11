@@ -10,7 +10,6 @@ falcon = "*"
 pip = "*"
 cython = "*"
 gunicorn = "*"
-simple-pid = "*"
 pigpio = "*"
 
 [requires]

@@ -20,15 +20,13 @@ class BoatData:
     max_roll = Value('i', 0)
     max_pitch = Value('i', 0)
     cts = Value('i', 0)
-    power = Value('f', 0.0)
+    power = Value('i', 0)
     config = Value('i', 0)
-    calibration = Value('i', 0)
+    calibration = Value('i', 0)  # reported calibration
     kp = Value('i', 50)
     ki = Value('i', 3)
     kd = Value('i', 25)
-    gain = Value('i', 1)
-    set_cal = Value('i', 0)
-    set_helm = Value('i', 0)
+    set_cal = Value('i', 0)  # 0 = no action, 1 = unset, 2 = set
 
 
 def background(bd):

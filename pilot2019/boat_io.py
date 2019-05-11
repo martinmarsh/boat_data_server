@@ -90,24 +90,21 @@ class BoatModel:
     def update(self):
         self._read_cmps_data()
 
-    def helm_drive(self, helm_adjust):
+    def helm_drive(self, power, direction):
         """
         Drives the helm motor using PWM where 1,000,000 is
         full on
-        :param helm_adjust: +/- 1000 for full on
+        :param power: +/- 1000 for full on
+        :param direction: 1 for starboard -1 for port
         :return:
         """
-
-        self.helm_direction = 1 if helm_adjust > 0 else -1
-        if self.helm_direction > 1:
+        if direction > 1:
             self._starboard()
         else:
             self._port()
 
-        self.power = min(abs(helm_adjust), 1000)
-
         # 5khz rate - pulse width is fraction of 1M
-        self._pi.hardware_PWM(18, 5000, int(self.power * 1000))
+        self._pi.hardware_PWM(18, 5000, int(power * 1000))
 
     def config_save(self):
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF0)
