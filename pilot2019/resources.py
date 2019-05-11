@@ -44,7 +44,8 @@ class CalibrationResource:
             'kp': BoatData.kp.value,
             'ki': BoatData.ki.value,
             'kd': BoatData.kd.value,
-            'set_cal ': BoatData.set_cal.value,
+            'set_cal': BoatData.set_cal.value,
+            'calibration': BoatData.calibration.value,
         }
 
     def on_get(self, req, resp):
