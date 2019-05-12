@@ -20,11 +20,15 @@ class Monitor:
         self.heading = 0
         self.last_heading = 0
         self.last_cts = self.cts = -1
+        self.last_kp = self.last_kd = self.last_ki = 0
         # must be last statement
         self.loop_for_ever()
 
     def helm_calibration(self):
-        self.helm.set_tunings(self.bd.kp.value, self.bd.ki.value, self.bd.kd.value)
+        self.last_kp = self.bd.kp.value
+        self.last_kd = self.bd.kd.value
+        self.last_ki = self.bd.ki.value
+        self.helm.set_tunings(self.last_kp, self.last_kd, self.last_ki)
 
     def auto_helm(self):
         dt = self.compass_read_at - self.helm_last_read_at
@@ -61,6 +65,8 @@ class Monitor:
             self.bd.calibration.value = self.boat.calibration
             helm_count += 1
             orientation_count += 1
+            if self.last_kp != self.bd.kp.value or self.last_kd != self.bd.kd.value or self.last_ki != self.bd.ki.value:
+                self.helm_calibration()
             if helm_count == self.auto_helm_sample:
                 self.auto_helm()
                 helm_count = 0

@@ -13,7 +13,7 @@ class BoatModel:
         self.run = 0
 
         self.helm = 0
-        self.gain = 0.01
+        self.gain = 0.02
         self.momentum = 1
         self._direction = 1
         self.power_bias = 0

@@ -32,12 +32,13 @@ class Helm:
         self.power = 0
         print(self.kp, self.ki, self.kd)
 
-    def set_tunings(self, kp, ki, kd):
+    def set_tunings(self, kp, kd, ki):
         self.kp = kp
         self.ki = ki
         self.kd = kd
         self._last_input = 0
         self.integral = 0
+        print(self.kp,  self.kd,  self.ki)
 
     def fast_response_drive(self, heading, cts):
         self.cts = cts
@@ -55,13 +56,18 @@ class Helm:
         turning_time = monotonic() - self.helm_full_start
         direction = -1 if self.error < 0 else 1
         abs_turn_rate = abs(self.turn_rate)
+        power = 1000
         if self.turn_rate:
             time_to_cts = abs(self.error / self.turn_rate)
             if time_to_cts < turning_time:
                 direction = -direction
                 if abs_turn_rate < 50:
                     self.helm_full_start = False
-        return 1000, direction
+            turn_direction = -1 if self.turn_rate < 0 else 1
+            if abs(self.turn_rate) > 100 and turn_direction == direction:
+                power = 0
+
+        return power, direction
 
     def get_drive(self, dt, heading, cts):
         self.heading = heading
