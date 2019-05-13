@@ -44,7 +44,7 @@ class SimulationResource:
             "gain": BoatData.simulator_gain.value,
             "speed": BoatData.simulator_speed.value,
             "power_bias": BoatData.simulator_power_bias.value,
-            "rudder_rate": BoatData.simulator_rudder_rate.value,
+            "rudder_rate": round(BoatData.simulator_rudder_rate.value, 3),
         }
 
     def on_get(self, req, resp):
@@ -55,8 +55,9 @@ class SimulationResource:
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_201
         for var, val in req.media.items():
+            var = 'simulator_{}'.format(var)
             attr = getattr(BoatData, var, None)
-            if attr == "rudder_rate":
+            if var == "simulator_rudder_rate":
                 attr.value = float(val)
             else:
                 attr.value = int(val)
@@ -86,9 +87,11 @@ class CalibrationResource:
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_201
         for var, val in req.media.items():
-            attr = getattr(BoatData, var, None)
-            attr.value = int(val)
-            resp.status = falcon.HTTP_201
+            # check name for security
+            if var in ['kp', 'ki', 'kd', 'set_cal']:
+                attr = getattr(BoatData, var, None)
+                attr.value = int(val)
+                resp.status = falcon.HTTP_201
         doc = self.get_doc()
         # Create a JSON representation of the resource
         resp.body = json.dumps(doc, ensure_ascii=False)
