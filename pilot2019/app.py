@@ -40,7 +40,7 @@ simulation_resource = SimulationResource()
 api.add_route('/api/calibration', calibration_resource)
 api.add_route('/api/orientation', orientation_resource)
 api.add_route('/api/simulation', simulation_resource)
-api.add_static_route('/', '{}/web/'.format(current_directory))
+api.add_static_route('/', '{}/web/'.format(current_directory), fallback_filename='index.html')
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))
 
