@@ -1,4 +1,5 @@
 from time import monotonic
+import math
 
 
 class BoatModel:
@@ -13,10 +14,12 @@ class BoatModel:
         self.run = 0
 
         self.helm = 0
-        self.gain = 0.02
-        self.momentum = 1
+        self.gain = 36
+        self.speed = 12
         self._direction = 1
+        self.rudder_angle = 0
         self.power_bias = 0
+        self.rudder_rate = 1.2
         self.last_read_at = monotonic()
         self.read_at = self.last_read_at
 
@@ -24,9 +27,17 @@ class BoatModel:
         self.read_at = monotonic()
         dt = self.read_at - self.last_read_at
         self.last_read_at = self.read_at
-        self.helm += (self._power * self._direction + self.power_bias) * self.gain * dt
+        # rudder angle - wheel turns 500 degrees in either direction giving an rudder angle of about 30 degrees.
+        # The helm gearing ratio is therefore 500/30
+        # wheel turns at full motor speed 20 degrees per second ie 20*30/500 = 1.2 degrees of rudder per second
+        # this gives 30/1.2 ie 25 seconds to full lock
+        self.rudder_angle += ((self._power + self.power_bias) / 1000 * self._direction * dt * self.rudder_rate)
+        # the pivotal force is related to the rudder angle and speed
+        # to estimate this lets say at 6knots turning wheel 45 turns boat at 10 per second ie
+        # 2.7 degrees of rudder is 0.047 so gain would be 10/0.047 = 212/6 = approx 36
+        self.helm = math.sin(math.radians(self.rudder_angle)) * self.gain * self.speed * dt
 
-        self.compass += int(self.helm * dt * self.momentum)
+        self.compass += int(self.helm * dt * 10)   # *10 for deci degrees
         if self.compass > 3600:
             self.compass -= 3600
         elif self.compass < 0:

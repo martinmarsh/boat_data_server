@@ -22,11 +22,16 @@ class BoatData:
     cts = Value('i', 0)
     power = Value('i', 0)
     config = Value('i', 0)
-    calibration = Value('i', 0)  # reported calibration
-    kp = Value('i', 50)
-    ki = Value('i', 3)
-    kd = Value('i', 25)
-    set_cal = Value('i', 0)  # 0 = no action, 1 = unset, 2 = set
+    calibration = Value('i', 0)        # calibration reported by chip
+    kp = Value('i', 200)
+    ki = Value('i', 12)
+    kd = Value('i', 100)
+    set_cal = Value('b', 0)           # chip calibration:  0 = no action, 1 = unset, 2 = set
+    simulator_on = Value('b', 1)      # 0 = live io,  >0 = simulated io,(2 means reset sim parameters)
+    simulator_gain = Value('i', 36)
+    simulator_speed = Value('i', 6)
+    simulator_power_bias = Value('i', 0)
+    simulator_rudder_rate = Value('f', 1.2)
 
 
 def background(bd):

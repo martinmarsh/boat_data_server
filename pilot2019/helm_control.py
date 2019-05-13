@@ -105,7 +105,7 @@ class Helm:
             correction = -turn_limit
 
         self.set_point = correction
-        drive = self.pid(self.turn_rate, dt)
+        drive = self.pid(self.turn_rate, dt) // 4  # Allows k parameters to be 4 times more
         self.direction = -1 if drive < 0 else 1
         self.power = min(abs(drive), 1000)
         return self.power, self.direction

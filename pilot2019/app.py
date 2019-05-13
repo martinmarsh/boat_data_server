@@ -1,5 +1,5 @@
 import falcon
-from .resources import CalibrationResource, OrientationResource
+from .resources import CalibrationResource, OrientationResource, SimulationResource
 from .task import process_start
 import os
 
@@ -35,9 +35,11 @@ print(current_directory)
 
 calibration_resource = CalibrationResource()
 orientation_resource = OrientationResource()
+simulation_resource = SimulationResource()
 
-api.add_route('/calibration', calibration_resource)
-api.add_route('/orientation', orientation_resource)
+api.add_route('/api/calibration', calibration_resource)
+api.add_route('/api/orientation', orientation_resource)
+api.add_route('/api/simulation', simulation_resource)
 api.add_static_route('/', '{}/web/'.format(current_directory))
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))

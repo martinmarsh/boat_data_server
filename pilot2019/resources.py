@@ -35,8 +35,38 @@ class OrientationResource:
         resp.body = json.dumps(doc, ensure_ascii=False)
 
 
+class SimulationResource:
+
+    @staticmethod
+    def get_doc():
+        return {
+            "on": BoatData.simulator_on.value,
+            "gain": BoatData.simulator_gain.value,
+            "speed": BoatData.simulator_speed.value,
+            "power_bias": BoatData.simulator_power_bias.value,
+            "rudder_rate": BoatData.simulator_rudder_rate.value,
+        }
+
+    def on_get(self, req, resp):
+        doc = self.get_doc()
+        # Create a JSON representation of the resource
+        resp.body = json.dumps(doc, ensure_ascii=False)
+
+    def on_post(self, req, resp):
+        resp.status = falcon.HTTP_201
+        for var, val in req.media.items():
+            attr = getattr(BoatData, var, None)
+            if attr == "rudder_rate":
+                attr.value = float(val)
+            else:
+                attr.value = int(val)
+            resp.status = falcon.HTTP_201
+        doc = self.get_doc()
+        # Create a JSON representation of the resource
+        resp.body = json.dumps(doc, ensure_ascii=False)
+
+
 class CalibrationResource:
-    doc_in = None
 
     @staticmethod
     def get_doc():
