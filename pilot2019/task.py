@@ -29,7 +29,7 @@ class BoatData:
     set_cal = Value('b', 0)           # chip calibration:  0 = no action, 1 = unset, 2 = set
     simulator_on = Value('b', 1)      # 0 = live io,  >0 = simulated io,(2 means reset sim parameters)
     simulator_gain = Value('i', 36)
-    simulator_speed = Value('i', 6)
+    simulator_speed = Value('f', 6.0)
     simulator_power_bias = Value('i', 0)
     simulator_rudder_rate = Value('f', 1.2)
 

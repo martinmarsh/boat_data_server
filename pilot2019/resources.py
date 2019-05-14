@@ -57,7 +57,7 @@ class SimulationResource:
         for var, val in req.media.items():
             var = 'simulator_{}'.format(var)
             attr = getattr(BoatData, var, None)
-            if var == "simulator_rudder_rate":
+            if var in ["simulator_rudder_rate", "simulator_speed"]:
                 attr.value = float(val)
             else:
                 attr.value = int(val)
