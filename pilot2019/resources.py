@@ -61,6 +61,7 @@ class SimulationResource:
                 attr.value = float(val)
             else:
                 attr.value = int(val)
+                print("v", var, attr.value)
             resp.status = falcon.HTTP_201
         doc = self.get_doc()
         # Create a JSON representation of the resource

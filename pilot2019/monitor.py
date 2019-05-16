@@ -36,6 +36,7 @@ class Monitor:
     def simulator_setup(self):
         self.simulator_on = self.bd.simulator_on.value
         if self.simulator_on:
+            print("***on")
             self.bd.simulator_on.value = self.simulator_on = 1    # ensure both =1, value 2 means reset
             self.boat = SimulatedBoatModel()
             self.boat.gain = self.bd.simulator_gain.value
@@ -43,6 +44,8 @@ class Monitor:
             self.boat.power_bias = self.bd.simulator_power_bias.value
             self.boat.rudder_rate = self.bd.simulator_rudder_rate.value
         else:
+            print("***off")
+            self.bd.simulator_on.value = self.simulator_on = 0
             self.boat = BoatModel()
 
         self.helm_last_read_at = self.compass_read_at = monotonic()
