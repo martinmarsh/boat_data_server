@@ -43,6 +43,7 @@ class Monitor:
             self.boat.speed = self.bd.simulator_speed.value
             self.boat.power_bias = self.bd.simulator_power_bias.value
             self.boat.rudder_rate = self.bd.simulator_rudder_rate.value
+            self.boat.compass = self.heading
         else:
             print("***off")
             self.bd.simulator_on.value = self.simulator_on = 0

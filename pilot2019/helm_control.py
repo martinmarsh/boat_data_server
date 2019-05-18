@@ -44,7 +44,7 @@ class Helm:
         self.cts = cts
         error = self.relative_direction(self.cts - heading)
         direction = -1 if error < 0 else 1
-        if abs(error) > 90:
+        if abs(error) > 90 and not self.helm_full_start:
             self.integral = 0
             self.d_input = 0
             self.power = 1000
@@ -132,7 +132,7 @@ class Helm:
         # compute final output
         output = proportional + self.integral + derivative
 
-        print(output, 'params:', proportional, derivative, self.integral)
+        print('pid:', output, 'params (p,d,i):', proportional, derivative, self.integral)
 
         # keep track of state
         self._last_input = input_

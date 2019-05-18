@@ -31,18 +31,20 @@ class BoatModel:
         # The helm gearing ratio is therefore 500/30
         # wheel turns at full motor speed 20 degrees per second ie 20*30/500 = 1.2 degrees of rudder per second
         # this gives 30/1.2 ie 25 seconds to full lock
-        self.rudder_angle += ((self._power + self.power_bias) / 1000 * self._direction * dt * self.rudder_rate)
+        self.rudder_angle += ((self._power * self._direction + self.power_bias) / 1000 * dt * self.rudder_rate)
         # the pivotal force is related to the rudder angle and speed
         # to estimate this lets say at 6knots turning wheel 45 turns boat at 10 per second ie
         # 2.7 degrees of rudder is 0.047 so gain would be 10/0.047 = 212/6 = approx 36
-        self.helm = math.sin(math.radians(self.rudder_angle)) * self.gain * self.speed * dt
+        radians = math.radians(self.rudder_angle)
+        force = math.sin(radians) * math.cos(radians)
+        self.helm = force * self.gain * self.speed * dt
 
         self.compass += int(self.helm * dt * 10)   # *10 for deci degrees
         if self.compass > 3600:
             self.compass -= 3600
         elif self.compass < 0:
             self.compass += 3600
-        # print(self.compass, round(dt, 3))
+        print('angle', self.rudder_angle, 'force', force, 'helm', self.helm, 'compass', self.compass, 'dt', round(dt, 3))
         return self.compass
 
     def read_pitch(self):
