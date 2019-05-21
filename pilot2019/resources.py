@@ -44,7 +44,6 @@ class SimulationResource:
             "gain": BoatData.simulator_gain.value,
             "speed": BoatData.simulator_speed.value,
             "power_bias": BoatData.simulator_power_bias.value,
-            "rudder_rate": round(BoatData.simulator_rudder_rate.value, 3),
         }
 
     def on_get(self, req, resp):
@@ -76,6 +75,7 @@ class CalibrationResource:
             'kp': BoatData.kp.value,
             'ki': BoatData.ki.value,
             'kd': BoatData.kd.value,
+            "rudder_rate": round(BoatData.rudder_rate.value, 3),
             'set_cal': BoatData.set_cal.value,
             'calibration': BoatData.calibration.value,
         }
@@ -89,8 +89,10 @@ class CalibrationResource:
         resp.status = falcon.HTTP_201
         for var, val in req.media.items():
             # check name for security
-            if var in ['kp', 'ki', 'kd', 'set_cal']:
-                attr = getattr(BoatData, var, None)
+            attr = getattr(BoatData, var, None)
+            if var == "rudder_rate":
+                attr.value = float(val)
+            elif var in ['kp', 'ki', 'kd', 'set_cal']:
                 attr.value = int(val)
                 resp.status = falcon.HTTP_201
         doc = self.get_doc()

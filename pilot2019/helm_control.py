@@ -28,17 +28,19 @@ class Helm:
         self.helm_full_start = False
         self.error = 0
         self.turn_rate = 0
-        self.direction = 1
         self.power = 0
-        print(self.kp, self.ki, self.kd)
+        self.rudder_rate = 0
+        self.rudder_position = 0
+        self.direction = 1
 
-    def set_tunings(self, kp, kd, ki):
+    def set_tunings(self, kp, kd, ki, rudder_rate):
         self.kp = kp
         self.ki = ki
         self.kd = kd
+        self.rudder_rate = rudder_rate
         self._last_input = 0
         self.integral = 0
-        print(self.kp,  self.kd,  self.ki)
+        print(self.kp,  self.kd,  self.ki, self.rudder_rate)
 
     def fast_response_drive(self, heading, cts):
         self.cts = cts
@@ -70,6 +72,7 @@ class Helm:
         return power, direction
 
     def get_drive(self, dt, heading, cts):
+        self.estimate_rudder_position(dt)
         self.heading = heading
         self.cts = cts
 
@@ -82,12 +85,15 @@ class Helm:
 
         # When a large course change is ordered control boat turning rate until in PID control range
         if self.helm_full_start:
-            if abs_error < 90 and abs(self.turn_rate) < 50:
+            if abs_error < 90 or abs(self.turn_rate) < 50:
                 self.helm_full_start = False
             else:
                 return self.major_course_control()
 
-        # make correction the desired rate of turn in deci-degrees
+        if abs_error < 50 and abs(self.turn_rate) < 10:
+            self.rudder_position = 0
+
+            # make correction the desired rate of turn in deci-degrees
         # A default settlement time of 3 seconds means that:
         # at 12 degrees it will be 4 degrees per second
         # at 9 degrees it will be 3 degrees per second
@@ -109,6 +115,9 @@ class Helm:
         self.direction = -1 if drive < 0 else 1
         self.power = min(abs(drive), 1000)
         return self.power, self.direction
+
+    def estimate_rudder_position(self, dt):
+        self.rudder_position += self.power*self.direction*self.rudder_rate*dt/1000
 
     @staticmethod
     def relative_direction(diff):
@@ -132,7 +141,8 @@ class Helm:
         # compute final output
         output = proportional + self.integral + derivative
 
-        print('pid:', output, 'params (p,d,i):', proportional, derivative, self.integral)
+        print('pid:', output, 'params (p,d,i):', proportional, derivative, self.integral,
+              'rudder:', self.rudder_position)
 
         # keep track of state
         self._last_input = input_

@@ -22,6 +22,7 @@ class Monitor:
         self.last_heading = 0
         self.last_cts = self.cts = -1
         self.last_kp = self.last_kd = self.last_ki = 0
+        self.last_rudder_rate = 1
         self.simulator_setup()
 
         # must be last statement
@@ -31,7 +32,8 @@ class Monitor:
         self.last_kp = self.bd.kp.value
         self.last_kd = self.bd.kd.value
         self.last_ki = self.bd.ki.value
-        self.helm.set_tunings(self.last_kp, self.last_kd, self.last_ki)
+        self.last_rudder_rate = self.bd.rudder_rate.value
+        self.helm.set_tunings(self.last_kp, self.last_kd, self.last_ki, self.last_rudder_rate)
 
     def simulator_setup(self):
         self.simulator_on = self.bd.simulator_on.value
@@ -42,13 +44,13 @@ class Monitor:
             self.boat.gain = self.bd.simulator_gain.value
             self.boat.speed = self.bd.simulator_speed.value
             self.boat.power_bias = self.bd.simulator_power_bias.value
-            self.boat.rudder_rate = self.bd.simulator_rudder_rate.value
-            self.boat.compass = self.heading
+            self.boat.rudder_rate = self.bd.rudder_rate.value
         else:
             print("***off")
             self.bd.simulator_on.value = self.simulator_on = 0
             self.boat = BoatModel()
 
+        self.boat.compass = self.heading
         self.helm_last_read_at = self.compass_read_at = monotonic()
         self.last_cts = self.cts = self.last_heading = self.heading = self.boat.read_compass()
 
@@ -84,7 +86,10 @@ class Monitor:
             self.bd.calibration.value = self.boat.calibration
             helm_count += 1
             orientation_count += 1
-            if self.last_kp != self.bd.kp.value or self.last_kd != self.bd.kd.value or self.last_ki != self.bd.ki.value:
+            if self.last_kp != self.bd.kp.value\
+                    or self.last_kd != self.bd.kd.value\
+                    or self.last_ki != self.bd.ki.value\
+                    or self.last_rudder_rate != self.bd.rudder_rate.value:
                 self.helm_calibration()
             if helm_count == self.auto_helm_sample:
                 if self.bd.simulator_on.value != self.simulator_on:

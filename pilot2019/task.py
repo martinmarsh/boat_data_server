@@ -21,6 +21,7 @@ class BoatData:
     max_pitch = Value('i', 0)
     cts = Value('i', 0)
     power = Value('i', 0)
+    rudder_rate = Value('f', 1.2)
     config = Value('i', 0)
     calibration = Value('i', 0)        # calibration reported by chip
     kp = Value('i', 200)
@@ -31,7 +32,6 @@ class BoatData:
     simulator_gain = Value('i', 36)
     simulator_speed = Value('f', 6.0)
     simulator_power_bias = Value('i', 0)
-    simulator_rudder_rate = Value('f', 1.2)
 
 
 def background(bd):
