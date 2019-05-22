@@ -16,7 +16,7 @@ class BoatModel:
         self.helm_direction = 1
         self.roll = 0
         self.pitch = 0
-        self.run = 0
+        self.run = 1
 
     def _port(self):
         self._pi.write(23, 0)
