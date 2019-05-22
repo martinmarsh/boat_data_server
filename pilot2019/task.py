@@ -15,6 +15,7 @@ class BoatData:
 
     """
     heading = Value('f', 0.0)
+    enable_drive = Value('i', 0)
     roll = Value('i', 0)
     pitch = Value('i', 0)
     max_roll = Value('i', 0)
