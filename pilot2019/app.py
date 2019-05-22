@@ -44,6 +44,8 @@ api.add_static_route('/', '{}/web/'.format(current_directory), fallback_filename
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))
 
+os.environ['REACT_APP_THIS_HOST'] = "http://localhost"
+
 process_start()
 
 
