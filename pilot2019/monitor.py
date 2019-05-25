@@ -83,6 +83,7 @@ class Monitor:
                 power, direction = self.helm.fast_response_drive(self.heading, self.cts)
                 self.boat.helm_drive(power, direction)
                 self.last_cts = self.cts
+
             self.bd.calibration.value = self.boat.calibration
             helm_count += 1
             orientation_count += 1

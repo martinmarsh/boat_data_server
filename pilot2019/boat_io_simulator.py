@@ -27,7 +27,7 @@ class BoatModel:
         self.read_at = monotonic()
         dt = self.read_at - self.last_read_at
         self.last_read_at = self.read_at
-        # rudder angle - wheel turns 500 degrees in either direction giving an rudder angle of about 30 degrees.
+        # rudder angle - wheel turns 500 degrees in either power_direction giving an rudder angle of about 30 degrees.
         # The helm gearing ratio is therefore 500/30
         # wheel turns at full motor speed 20 degrees per second ie 20*30/500 = 1.2 degrees of rudder per second
         # this gives 30/1.2 ie 25 seconds to full lock

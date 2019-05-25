@@ -31,7 +31,8 @@ class Helm:
         self.power = 0
         self.rudder_rate = 0
         self.rudder_position = 0
-        self.direction = 1
+        self.power_direction = 1          # power power_direction
+        self.turn_direction = 1
 
     def set_tunings(self, kp, kd, ki, rudder_rate):
         self.kp = kp
@@ -50,24 +51,28 @@ class Helm:
             self.integral = 0
             self.d_input = 0
             self.power = 1000
-            self.direction = direction
+            self.power_direction = direction
             self.helm_full_start = monotonic()
-        return self.power, self.direction
+        return self.power, self.power_direction
 
-    def major_course_control(self):
+    def _major_course_control(self):
         turning_time = monotonic() - self.helm_full_start
         direction = -1 if self.error < 0 else 1
         abs_turn_rate = abs(self.turn_rate)
         power = 1000
-        if self.turn_rate:
+
+        if abs_turn_rate > 10:
+            self.integral = 0
             time_to_cts = abs(self.error / self.turn_rate)
             if time_to_cts < turning_time:
                 direction = -direction
                 if abs_turn_rate < 50:
                     self.helm_full_start = False
-            turn_direction = -1 if self.turn_rate < 0 else 1
-            if abs(self.turn_rate) > 100 and turn_direction == direction:
+            if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and self.turn_direction == direction:
                 power = 0
+        elif abs(self.rudder_position) > 2:
+            self.helm_full_start = False
+            self.integral = 0
 
         return power, direction
 
@@ -78,6 +83,7 @@ class Helm:
 
         # min turn rate resolvable is 1 deci-degree per sec ie 1 degree per 10 seconds, max 1800 is physically unlikely
         self.turn_rate = int(self.relative_direction(self.heading - self.last_heading) // dt)
+        self.turn_direction = -1 if self.turn_rate < 0 else 1
         self.last_heading = self.heading
 
         self.error = self.relative_direction(self.cts - self.heading)
@@ -85,21 +91,21 @@ class Helm:
 
         # When a large course change is ordered control boat turning rate until in PID control range
         if self.helm_full_start:
-            if abs_error < 90 or abs(self.turn_rate) < 50:
+            if abs_error < 90:
                 self.helm_full_start = False
+                self.integral = 0
             else:
-                return self.major_course_control()
+                return self._major_course_control()
 
         if abs_error < 50 and abs(self.turn_rate) < 10:
             self.rudder_position = 0
 
-            # make correction the desired rate of turn in deci-degrees
-        # A default settlement time of 3 seconds means that:
-        # at 12 degrees it will be 4 degrees per second
-        # at 9 degrees it will be 3 degrees per second
-        # at 6 degrees error the settlement time is 2 degrees per seconds and the turn rate
+        # make correction the desired rate of turn in deci-degrees
+        # A default settlement time of 6 seconds means that:
+        # at 9 degrees it will be 1.5 degrees per second
+        # at 6 degrees error the settlement time is 1 degrees per second
 
-        correction = self.error//3
+        correction = self.error//6
 
         # limit rate to 5 degrees per second
         # correction = turn_limit if correction > turn_
@@ -112,12 +118,17 @@ class Helm:
 
         self.set_point = correction
         drive = self.pid(self.turn_rate, dt) // 4  # Allows k parameters to be 4 times more
-        self.direction = -1 if drive < 0 else 1
+        self.power_direction = -1 if drive < 0 else 1
         self.power = min(abs(drive), 1000)
-        return self.power, self.direction
+
+        if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and\
+                self.turn_direction == self.power_direction:
+            self.power = 0
+            self.integral = 0
+        return self.power, self.power_direction
 
     def estimate_rudder_position(self, dt):
-        self.rudder_position += self.power*self.direction*self.rudder_rate*dt/1000
+        self.rudder_position += self.power * self.power_direction * self.rudder_rate * dt / 1000
 
     @staticmethod
     def relative_direction(diff):

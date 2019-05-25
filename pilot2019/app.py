@@ -1,7 +1,9 @@
 import falcon
 from .resources import CalibrationResource, OrientationResource, SimulationResource
 from .task import process_start
+from subprocess import Popen, PIPE
 import os
+import json
 
 
 class CORSComponent(object):
@@ -43,6 +45,27 @@ api.add_route('/api/simulation', simulation_resource)
 api.add_static_route('/', '{}/web/'.format(current_directory), fallback_filename='index.html')
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))
+
+
+ip = None
+try:
+    p = Popen(['ifconfig'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    op, err = p.communicate()
+    rc = p.returncode
+    if rc == 0:
+        op = str(op)
+        p = op.find('192.')
+        p2 = op.find(' ', p)
+        ip = op[p:p2]
+        config = {
+            "host": "http://{}:8079".format(ip)
+        }
+
+        with open('./web/config.json', 'w') as outfile:
+            json.dump(config, outfile)
+
+except (OSError, AttributeError):
+    pass
 
 process_start()
 
