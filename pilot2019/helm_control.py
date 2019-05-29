@@ -32,7 +32,7 @@ class Helm:
         self.rudder_rate = 0
         self.rudder_position = 0
         self.power_direction = 1          # power power_direction
-        self.turn_direction = 1
+        self.last_turn_direction = self.turn_direction = 1
 
     def set_tunings(self, kp, kd, ki, rudder_rate):
         self.kp = kp
@@ -43,88 +43,48 @@ class Helm:
         self.integral = 0
         print(self.kp,  self.kd,  self.ki, self.rudder_rate)
 
-    def fast_response_drive(self, heading, cts):
-        self.cts = cts
-        error = self.relative_direction(self.cts - heading)
-        direction = -1 if error < 0 else 1
-        if abs(error) > 90 and not self.helm_full_start:
-            self.integral = 0
-            self.d_input = 0
-            self.power = 1000
-            self.power_direction = direction
-            self.helm_full_start = monotonic()
-        return self.power, self.power_direction
-
-    def _major_course_control(self):
-        turning_time = monotonic() - self.helm_full_start
-        direction = -1 if self.error < 0 else 1
-        abs_turn_rate = abs(self.turn_rate)
-        power = 1000
-
-        if abs_turn_rate > 10:
-            self.integral = 0
-            time_to_cts = abs(self.error / self.turn_rate)
-            if time_to_cts < turning_time:
-                direction = -direction
-                if abs_turn_rate < 50:
-                    self.helm_full_start = False
-            if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and self.turn_direction == direction:
-                power = 0
-        elif abs(self.rudder_position) > 2:
-            self.helm_full_start = False
-            self.integral = 0
-
-        return power, direction
-
     def get_drive(self, dt, heading, cts):
-        self.estimate_rudder_position(dt)
         self.heading = heading
         self.cts = cts
-
+        self.last_turn_direction = self.turn_direction
         # min turn rate resolvable is 1 deci-degree per sec ie 1 degree per 10 seconds, max 1800 is physically unlikely
         self.turn_rate = int(self.relative_direction(self.heading - self.last_heading) // dt)
         self.turn_direction = -1 if self.turn_rate < 0 else 1
         self.last_heading = self.heading
 
-        self.error = self.relative_direction(self.cts - self.heading)
-        abs_error = abs(self.error)
+        self.error = self.relative_direction(self.heading - self.cts)
 
-        # When a large course change is ordered control boat turning rate until in PID control range
-        if self.helm_full_start:
-            if abs_error < 90:
-                self.helm_full_start = False
-                self.integral = 0
-            else:
-                return self._major_course_control()
+        # Power is proportional to wheel turning speed ignoring inefficiencies due to turning force varaitions and
+        # increases in motor current to compensate.  Assume rudder angle is sum of "power"
+        self.estimate_rudder_position(dt)
 
-        if abs_error < 50 and abs(self.turn_rate) < 10:
+        # Required rudder is dependant on the compass error
+
+        required_rudder = -self.error/40    # Error is in deci-degrees - 80 degree error ->  20 degree rudder
+
+        required_rudder = 20 if required_rudder > 20 else -20 if required_rudder < -20 else required_rudder
+
+        # ensure rudder estimate does not drift from zero by resetting origin when turn direction changes ie real
+        # rudder passes through zero. However, don't do this if we have a large estimated direction as at zero
+        # speed the rudder might  be driven too far.
+
+        if self.last_turn_direction != self.turn_direction and self.rudder_position < 10:
             self.rudder_position = 0
+        print("required", required_rudder, "actual", self.rudder_position)
 
-        # make correction the desired rate of turn in deci-degrees
-        # A default settlement time of 6 seconds means that:
-        # at 9 degrees it will be 1.5 degrees per second
-        # at 6 degrees error the settlement time is 1 degrees per second
+        self.set_point = self.rudder_position
+        drive = self.pd(required_rudder, dt)
 
-        correction = self.error//6
+        if abs(required_rudder) < 5:
+            # compute integral from -input from zero allows pushing to zero when some compass error
+            self.integral += int(self.ki * -required_rudder * dt)
+            drive += self.integral
+        else:
+            self.integral = 0
 
-        # limit rate to 5 degrees per second
-        # correction = turn_limit if correction > turn_
-        # limit else -turn_limit if correction < -turn_limit else correction
-        turn_limit = 50
-        if correction > turn_limit:
-            correction = turn_limit
-        elif correction < -turn_limit:
-            correction = -turn_limit
-
-        self.set_point = correction
-        drive = self.pid(self.turn_rate, dt) // 4  # Allows k parameters to be 4 times more
-        self.power_direction = -1 if drive < 0 else 1
+        self.power_direction = -1 if drive > 0 else 1
         self.power = min(abs(drive), 1000)
 
-        if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and\
-                self.turn_direction == self.power_direction:
-            self.power = 0
-            self.integral = 0
         return self.power, self.power_direction
 
     def estimate_rudder_position(self, dt):
@@ -138,24 +98,22 @@ class Helm:
             diff -= 3600
         return diff
 
-    def pid(self, input_, dt):
-        error = self.set_point - input_
-        self.d_input = input_ - self._last_input
+    def pd(self, pd_input, dt):
+        error = self.set_point - pd_input
+        self.d_input = pd_input - self._last_input
 
         proportional = self.kp * error
 
-        # compute integral and derivative terms
-        self.integral += int(self.ki * error * dt)
-
+        # compute derivative
         derivative = int(-self.kd * self.d_input / dt)
 
         # compute final output
-        output = proportional + self.integral + derivative
+        output = proportional + derivative
 
-        print('pid:', output, 'params (p,d,i):', proportional, derivative, self.integral,
+        print('pid:', output, 'params (p,d):', proportional, derivative,
               'rudder:', self.rudder_position)
 
         # keep track of state
-        self._last_input = input_
+        self._last_input = pd_input
 
         return output

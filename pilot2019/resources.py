@@ -13,6 +13,9 @@ class OrientationResource:
             'calibration': BoatData.calibration.value,
             'pitch': BoatData.pitch.value,
             'roll': BoatData.roll.value,
+            'power': BoatData.power.value,
+            'rudder': round(BoatData.rudder.value, 1),
+
         }
 
     def on_get(self, req, resp):
