@@ -8,8 +8,52 @@ class BoatData:
     'b': ctypes.c_byte,     'B': ctypes.c_ubyte,
     'h': ctypes.c_short,    'H': ctypes.c_ushort,
     'i': ctypes.c_int,      'I': ctypes.c_uint,
-    'l': ctypes.c_long,     'L': ctypes.c_ulong,
-    'q': ctypes.c_longlong, 'Q': ctypes.c_ulonglong,
+    'l': ctypes.c_long,     'L':
+
+    def process_response(self, req, resp, resource, req_succeeded):
+        resp.set_header('Access-Control-Allow-Origin', '*')
+
+        if req_succeeded and req.method == 'OPTIONS' and req.get_header('Access-Control-Request-Method'):
+            # NOTE(kgriffs): This is a CORS preflight request. Patch the
+            #   response accordingly.
+
+            allow = resp.get_header('Allow')
+            resp.delete_header('Allow')
+
+            allow_headers = req.get_header(
+                'Access-Control-Request-Headers',
+                default='*'
+            )
+
+            resp.set_headers((
+                ('Access-Control-Allow-Methods', allow),
+                ('Access-Control-Allow-Headers', allow_headers),
+                ('Access-Control-Max-Age', '86400'),  # 24 hours
+            ))
+ctypes.c_ulong,
+    'q': ctypes.c_longlong, 'Q': c
+
+    def process_response(self, req, resp, resource, req_succeeded):
+        resp.set_header('Access-Control-Allow-Origin', '*')
+
+        if req_succeeded and req.method == 'OPTIONS' and req.get_header('Access-Control-Request-Method'):
+            # NOTE(kgriffs): This is a CORS preflight request. Patch the
+            #   response accordingly.
+
+            allow = resp.get_header('Allow')
+            resp.delete_header('Allow')
+
+            allow_headers = req.get_header(
+                'Access-Control-Request-Headers',
+                default='*'
+            )
+
+            resp.set_headers((
+                ('Access-Control-Allow-Methods', allow),
+                ('Access-Control-Allow-Headers', allow_headers),
+                ('Access-Control-Max-Age', '86400'),  # 24 hours
+            ))
+types.c_ulonglong,
     'f': ctypes.c_float,    'd': ctypes.c_double
 
 
