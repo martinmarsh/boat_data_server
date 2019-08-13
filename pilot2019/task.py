@@ -70,9 +70,9 @@ types.c_ulonglong,
     rudder_rate = Value('f', 1.2)
     config = Value('i', 0)
     calibration = Value('i', 0)        # calibration reported by chip
-    kp = Value('i', 1)
-    ki = Value('i', 0)
-    kd = Value('i', 0)
+    kp = Value('i', 150)
+    ki = Value('i', 5)
+    kd = Value('i', 15)
     set_cal = Value('b', 0)           # chip calibration:  0 = no action, 1 = unset, 2 = set
     simulator_on = Value('b', 1)      # 0 = live io,  >0 = simulated io,(2 means reset sim parameters)
     simulator_gain = Value('i', 36)

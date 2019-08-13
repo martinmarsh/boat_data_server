@@ -1,7 +1,7 @@
 from time import sleep, monotonic
 from timeit import timeit
 from .boat_io_simulator import BoatModel as SimulatedBoatModel
-from .helm_control import Helm
+from .helm_control_rudder import Helm
 from .boat_io import BoatModel
 
 
@@ -38,7 +38,7 @@ class Monitor:
     def simulator_setup(self):
         self.simulator_on = self.bd.simulator_on.value
         if self.simulator_on:
-            print("***on")
+            print("** simulation on **")
             self.bd.simulator_on.value = self.simulator_on = 1    # ensure both =1, value 2 means reset
             self.boat = SimulatedBoatModel()
             self.boat.gain = self.bd.simulator_gain.value
@@ -46,7 +46,7 @@ class Monitor:
             self.boat.power_bias = self.bd.simulator_power_bias.value
             self.boat.rudder_rate = self.bd.rudder_rate.value
         else:
-            print("***off")
+            print("** simulation off **")
             self.bd.simulator_on.value = self.simulator_on = 0
             self.boat = BoatModel()
 
@@ -60,7 +60,7 @@ class Monitor:
         # Calculate drive factor and pass it to the boat steering helm drive
         power, direction = self.helm.get_drive(dt, self.heading, self.cts)
         self.boat.helm_drive(power, direction)
-        self.bd.power.value = (power * direction)
+        self.bd.power.value = int(power * direction)
 
     def loop_for_ever(self):
         self.helm_calibration()
@@ -79,12 +79,8 @@ class Monitor:
             self.compass_read_at = monotonic()
             self.bd.heading.value = self.heading/10
             self.cts = int(self.bd.cts.value * 10)
-            if self.cts != self.last_cts:
-                power, direction = self.helm.fast_response_drive(self.heading, self.cts)
-                self.boat.helm_drive(power, direction)
-                self.last_cts = self.cts
-
             self.bd.calibration.value = self.boat.calibration
+
             helm_count += 1
             orientation_count += 1
             if self.last_kp != self.bd.kp.value\
