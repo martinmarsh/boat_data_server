@@ -1,4 +1,4 @@
-from time import monotonic
+from time import monotonic, sleep
 import math
 
 
@@ -69,7 +69,10 @@ class BoatModel:
         print(power * direction)
 
     def config_save(self):
-        pass
+        print("simulation mode - cannot save")
+        sleep(2.0)
 
     def config_delete(self):
-        pass
+        print("simulation mode - cannot delete")
+        sleep(2.0)
+

@@ -106,3 +106,9 @@ class Monitor:
                 self.bd.max_pitch.value = int(self.pitch_total / self.orientation_sample)
                 self.pitch_total = 0
                 orientation_count = 0
+            if self.bd.set_cal.value == 1:
+                self.boat.config_delete()
+                self.bd.set_cal.value = 0
+            elif self.bd.set_cal.value == 2:
+                self.boat.config_save()
+                self.bd.set_cal.value = 0

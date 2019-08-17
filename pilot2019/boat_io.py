@@ -124,4 +124,4 @@ class BoatModel:
         self._pi.i2c_write_byte_data(self._cm, 0, 0xE2)
         sleep(.025)
         print("deleted config")
-        sleep((2.0))
+        sleep(2.0)
