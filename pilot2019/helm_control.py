@@ -29,10 +29,12 @@ class Helm:
         self.error = 0
         self.turn_rate = 0
         self.power = 0
+        self.full_stop = False
         self.rudder_rate = 0
         self.rudder_position = 0
         self.power_direction = 1          # power power_direction
         self.turn_direction = 1
+        self.power_stop_direction = 0
 
     def set_tunings(self, kp, kd, ki, rudder_rate):
         self.kp = kp
@@ -122,7 +124,17 @@ class Helm:
         self.power_direction = -1 if drive < 0 else 1
         self.power = min(abs(drive), 1000)
 
-        if 25 * self.power_direction - self.rudder_position < 0 or \
+        if abs(self.rudder_position) > 25 and not self.full_stop:
+            self.full_stop = True
+            self.power_stop_direction = self.power_direction
+        else:
+            self.full_stop = False
+
+        if self.power_stop_direction != self.power_direction:
+            self.full_stop = False
+            self.power_stop_direction = self.power_direction
+
+        if self.full_stop or \
                 (abs(self.turn_rate) > 100 and self.turn_direction == self.power_direction):
             self.power = 0
             self.integral = 0
