@@ -98,6 +98,8 @@ class BoatModel:
         :param direction: 1 for starboard -1 for port
         :return:
         """
+        self._direction = direction
+        self._power = power
         if direction > 0:
             self._starboard()
         else:

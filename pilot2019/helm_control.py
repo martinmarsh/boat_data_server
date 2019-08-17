@@ -68,7 +68,8 @@ class Helm:
                 direction = -direction
                 if abs_turn_rate < 50:
                     self.helm_full_start = False
-            if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and self.turn_direction == direction:
+            if abs(self.rudder_position) > 25 or \
+                    (abs(self.turn_rate) > 100 and self.turn_direction == direction):
                 power = 0
         elif abs(self.rudder_position) > 2:
             self.helm_full_start = False
@@ -121,8 +122,8 @@ class Helm:
         self.power_direction = -1 if drive < 0 else 1
         self.power = min(abs(drive), 1000)
 
-        if (abs(self.turn_rate) > 100 or abs(self.rudder_position) > 20) and\
-                self.turn_direction == self.power_direction:
+        if self.rudder_position > 25 * self.power_direction or \
+                (abs(self.turn_rate) > 100 and self.turn_direction == self.power_direction):
             self.power = 0
             self.integral = 0
         return self.power, self.power_direction
