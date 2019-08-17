@@ -110,11 +110,11 @@ class BoatModel:
 
     def config_save(self):
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF0)
-        sleep(.025)
+        sleep(.04)
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF5)
-        sleep(.025)
+        sleep(.04)
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF6)
-        sleep(.025)
+        sleep(.04)
         print("saved config")
         sleep(2.0)
 
