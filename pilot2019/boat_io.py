@@ -55,7 +55,7 @@ class BoatModel:
 
     def read_roll(self):
         self.roll = self._pi.i2c_read_byte_data(self._cm, 5)
-        return self.pitch
+        return self.roll
 
     def _read_cmps_data(self):
         # Read Compass in  deci-degrees
