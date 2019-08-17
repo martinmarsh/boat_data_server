@@ -108,16 +108,20 @@ class BoatModel:
 
     def config_save(self):
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF0)
-        sleep(.02)
+        sleep(.025)
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF5)
-        sleep(.02)
+        sleep(.025)
         self._pi.i2c_write_byte_data(self._cm, 0, 0xF6)
-        sleep(.02)
+        sleep(.025)
+        print("saved config")
+        sleep(2.0)
 
     def config_delete(self):
         self._pi.i2c_write_byte_data(self._cm, 0, 0xE0)
-        sleep(.02)
+        sleep(.025)
         self._pi.i2c_write_byte_data(self._cm, 0, 0xE5)
-        sleep(.02)
-        self._pi.i2c_write_byte_data(self._cm, 0, 0xE6)
-        sleep(.02)
+        sleep(.025)
+        self._pi.i2c_write_byte_data(self._cm, 0, 0xE2)
+        sleep(.025)
+        print("deleted config")
+        sleep((2.0))
