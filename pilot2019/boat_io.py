@@ -50,11 +50,11 @@ class BoatModel:
         return self.compass
 
     def read_pitch(self):
-        self.pitch = self._pi.i2c_read_byte_data(self._cm, 4)
+        self.pitch = self._pi.i2c_read_byte_data(self._cm, 0x04)
         return self.pitch
 
     def read_roll(self):
-        self.roll = self._pi.i2c_read_byte_data(self._cm, 5)
+        self.roll = self._pi.i2c_read_byte_data(self._cm, 0x05)
         return self.roll
 
     def _read_cmps_data(self):
@@ -98,8 +98,6 @@ class BoatModel:
         :param direction: 1 for starboard -1 for port
         :return:
         """
-        self._direction = direction
-        self._power = power
         if direction > 0:
             self._starboard()
         else:
