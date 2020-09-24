@@ -1,6 +1,5 @@
 import falcon
 from .resources import CalibrationResource, OrientationResource, SimulationResource
-from .task import process_start
 from subprocess import Popen, PIPE
 import os
 import json
@@ -67,7 +66,7 @@ try:
 except (OSError, AttributeError):
     pass
 
-process_start()
+
 
 
 

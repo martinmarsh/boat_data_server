@@ -8,13 +8,13 @@ class OrientationResource:
     @staticmethod
     def get_doc():
         return {
-            'heading': round(BoatData.heading.value, 1),
-            'cts': BoatData.cts.value,
-            'calibration': BoatData.calibration.value,
-            'pitch': BoatData.pitch.value,
-            'roll': BoatData.roll.value,
-            'power': BoatData.power.value,
-            'rudder': round(BoatData.rudder.value, 1),
+            'heading': round(BoatData.heading, 1),
+            'cts': BoatData.cts,
+            'calibration': BoatData.calibration,
+            'pitch': BoatData.pitch,
+            'roll': BoatData.roll,
+            'power': BoatData.power,
+            'rudder': round(BoatData.rudder, 1),
 
         }
 
@@ -43,10 +43,10 @@ class SimulationResource:
     @staticmethod
     def get_doc():
         return {
-            "on": BoatData.simulator_on.value,
-            "gain": BoatData.simulator_gain.value,
-            "speed": BoatData.simulator_speed.value,
-            "power_bias": BoatData.simulator_power_bias.value,
+            "on": BoatData.simulator_on,
+            "gain": BoatData.simulator_gain,
+            "speed": BoatData.simulator_speed,
+            "power_bias": BoatData.simulator_power_bias,
         }
 
     def on_get(self, req, resp):
