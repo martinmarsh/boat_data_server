@@ -25,5 +25,6 @@ The server also allows the contained React front end (produced by NavDash) to be
 
 Screen shot:
 
-
+![navdas screebshot](navdash.png)
+Format: ![Alt Text](url)
 
