@@ -20,3 +20,10 @@ collection, logging and distribution.  This repro is now solely concerned with p
 The data concerned is a single record in the form of a dictionary of key pairs.
 The keys will vary according to what devices are available. Critical data such
 as position has a timestamp.
+
+The server also allows the contained React front end (produced by NavDash) to be loaded.
+
+Screen shot:
+
+
+

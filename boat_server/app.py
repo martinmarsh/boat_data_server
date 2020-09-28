@@ -1,5 +1,5 @@
 import falcon
-from .resources import CalibrationResource, OrientationResource
+from .resources import calibration_resource, orientation_resource
 from subprocess import Popen, PIPE
 import os
 import json
@@ -33,9 +33,6 @@ api = application = falcon.API(middleware=[CORSComponent()])
 
 current_directory = os.getcwd()
 print(current_directory)
-
-calibration_resource = CalibrationResource()
-orientation_resource = OrientationResource()
 
 
 api.add_route('/api/calibration', calibration_resource)
