@@ -1,6 +1,5 @@
 import falcon
-from .resources import CalibrationResource, OrientationResource, SimulationResource
-from .task import process_start
+from .resources import calibration_resource, orientation_resource
 from subprocess import Popen, PIPE
 import os
 import json
@@ -35,13 +34,10 @@ api = application = falcon.API(middleware=[CORSComponent()])
 current_directory = os.getcwd()
 print(current_directory)
 
-calibration_resource = CalibrationResource()
-orientation_resource = OrientationResource()
-simulation_resource = SimulationResource()
 
 api.add_route('/api/calibration', calibration_resource)
 api.add_route('/api/orientation', orientation_resource)
-api.add_route('/api/simulation', simulation_resource)
+
 api.add_static_route('/', '{}/web/'.format(current_directory), fallback_filename='index.html')
 api.add_static_route('/css', '{}/web/css/'.format(current_directory))
 api.add_static_route('/media', '{}/web/media/'.format(current_directory))
@@ -67,7 +63,7 @@ try:
 except (OSError, AttributeError):
     pass
 
-process_start()
+
 
 
 

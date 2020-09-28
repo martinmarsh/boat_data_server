@@ -10,7 +10,6 @@ falcon = "*"
 pip = "*"
 cython = "*"
 gunicorn = "*"
-pigpio = "*"
+redis = "*"
 
 [requires]
-python_version = "3.6"
